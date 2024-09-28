@@ -88,14 +88,6 @@ docker run --platform linux/arm64 -it \
 
 
 # TODO:
-
-- add the pdf metadata to the elastic search index.
-- add the pdf entities to the elastic search index.
-- add the pdf summary to the elastic search index.
-- add the pdf keywords to the elastic search index.
-- add the pdf title to the elastic search index.
-- add the pdf author to the elastic search index.
-- add the pdf subject to the elastic search index.
-- add the pdf creation date to the elastic search index.
+- The app cannot index some papers in ES. Later switch to another vector DB if it fails.
 - Multimodal RAG for text, image, and table data.
 - 

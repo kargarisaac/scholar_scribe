@@ -48,7 +48,6 @@ def create_index_if_not_exists(index_name: str):
     - chunk_id: Numerical ID for each chunk within a paper
     - title and text: Full-text searchable fields
     - embedding: Dense vector for similarity search (384-dimensional, cosine similarity)
-    - metadata: Nested object with searchable paper metadata
 
     This structure supports full-text search, vector similarity, and structured querying.
     """
@@ -66,15 +65,6 @@ def create_index_if_not_exists(index_name: str):
                         'dims': 384,
                         'index': True,
                         'similarity': 'cosine'
-                    },
-                    'metadata': {
-                        'properties': {
-                            'title': {'type': 'text'},
-                            'author': {'type': 'text'},
-                            'subject': {'type': 'text'},
-                            'keywords': {'type': 'text'},
-                            'creation_date': {'type': 'date'}
-                        }
                     }
                 }
             }
@@ -130,38 +120,6 @@ def clean_text(text: str) -> str:
     # Remove special characters (keep alphanumeric, spaces, and basic punctuation)
     text = re.sub(r'[^a-zA-Z0-9\s.,;!?]', '', text)
     return text
-
-def extract_metadata(file_path: str) -> dict:
-    """
-    Extracts metadata from a PDF file.
-
-    This function opens a PDF file specified by the file path and extracts
-    its metadata, including title, author, subject, keywords, and creation date.
-
-    Args:
-        file_path (str): The path to the PDF file.
-
-    Returns:
-        dict: A dictionary containing the extracted metadata with the following keys:
-            - 'title': The title of the PDF (empty string if not available)
-            - 'author': The author of the PDF (empty string if not available)
-            - 'subject': The subject of the PDF (empty string if not available)
-            - 'keywords': The keywords associated with the PDF (empty string if not available)
-            - 'creation_date': The creation date of the PDF (empty string if not available)
-
-    Note:
-        This function uses the fitz library (PyMuPDF) to handle PDF operations.
-    """
-    with fitz.open(file_path) as doc:
-        metadata = doc.metadata
-    return {
-        'title': metadata.get('title', ''),
-        'author': metadata.get('author', ''),
-        'subject': metadata.get('subject', ''),
-        'keywords': metadata.get('keywords', ''),
-        'creation_date': metadata.get('creationDate', ''),
-    }
-
 
 def chunk_text(text: str, max_length: int = 500, overlap: int = 50) -> List[str]:
     """
@@ -301,7 +259,7 @@ def search_similar_chunks(query: str, top_k: int = 5):
 
     Returns:
         list: A list of dictionaries containing the top_k most similar chunks,
-              including their metadata and similarity scores.
+              including their similarity scores.
 
     Prints:
         - The dimension of the query vector.
@@ -335,7 +293,7 @@ def search_similar_chunks(query: str, top_k: int = 5):
         body={
             "size": top_k,
             "query": script_query,
-            "_source": ["paper_id", "chunk_id", "title", "text", "metadata"],
+            "_source": ["paper_id", "chunk_id", "title", "text"],
             "sort": [{"_score": "desc"}]
         }
     )
@@ -395,9 +353,6 @@ def main():
         text = clean_text(text)
         st.success(f"Extracted {len(text)} characters from the PDF.")
 
-        metadata = extract_metadata("temp.pdf")
-        st.write(f"Metadata: {metadata}")
-
         # Chunk the text
         chunks = chunk_text(text, max_length=500)
         st.success(f"Created {len(chunks)} chunks from the text.")
@@ -440,19 +395,9 @@ def main():
         # Add a slider for the number of results
         num_results = st.slider("Number of relevant excerpts to display", min_value=1, max_value=10, value=5)
         
-        # show num_results
-        st.write(f"Number of relevant excerpts to display: {num_results}")
-
         if user_query:
             # Search similar chunks
             similar_chunks = search_similar_chunks(user_query, top_k=num_results)
-
-            st.write("number of similar chunks: ", len(similar_chunks))
-
-            # Display similar chunks
-            st.subheader("Relevant excerpts:")
-            for i, hit in enumerate(similar_chunks):
-                st.text_area(f"Excerpt {i+1}", hit['_source']['text'], height=100)
 
             # Generate answer using OpenAI
             try:

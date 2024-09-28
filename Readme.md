@@ -4,12 +4,10 @@ This project is a web application that allows users to search for scholarly arti
 
 ## Features
 
-- Search for scholarly articles using Elasticsearch.
-- Generate summaries of the articles using OpenAI.
-- Save and manage your search history.
+- 
 
 
-# How to Setup Vast.ai Server
+## How to Setup Vast.ai Server
 
 - Create the Server
 
@@ -61,3 +59,43 @@ cat ~/.ssh/id_rsa.pub
 git clone https://github.com/kargarisaac/scholar-scribe.git
 ```
 
+## Elastic Search as the database
+
+- Run the Elasticsearch container:
+```bash
+docker run -it \
+    --rm \
+    --name elasticsearch \
+    -m 4GB \
+    -p 9200:9200 \
+    -p 9300:9300 \
+    -e "discovery.type=single-node" \
+    -e "xpack.security.enabled=false" \
+    docker.elastic.co/elasticsearch/elasticsearch:8.4.3
+```
+
+- If you use mac, use the Arm version of Elasticsearch:
+```bash
+docker run --platform linux/arm64 -it \
+    --rm \
+    --name elasticsearch \
+    -p 9200:9200 \
+    -p 9300:9300 \
+    -e "discovery.type=single-node" \
+    -e "xpack.security.enabled=false" \
+    docker.elastic.co/elasticsearch/elasticsearch:8.4.3-arm64
+```
+
+
+# TODO:
+
+- add the pdf metadata to the elastic search index.
+- add the pdf entities to the elastic search index.
+- add the pdf summary to the elastic search index.
+- add the pdf keywords to the elastic search index.
+- add the pdf title to the elastic search index.
+- add the pdf author to the elastic search index.
+- add the pdf subject to the elastic search index.
+- add the pdf creation date to the elastic search index.
+- Multimodal RAG for text, image, and table data.
+- 

@@ -1,7 +1,10 @@
 tqdm 
-notebook==7.1.2 
 openai 
 elasticsearch
-scikit-learn
 pandas
 python-dotenv
+streamlit
+PyMuPDF
+sentence_transformers
+tf-keras
+spacy

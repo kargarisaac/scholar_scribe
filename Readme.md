@@ -40,12 +40,18 @@ OPENAI_API_KEY=your_openai_api_key
 
 - Generate ssh-key
 ```bash
-ssh-keygen -t ed25519 -C "your_email@example.com"
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+```
+
+- Add your SSH key to the SSH agent:
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_rsa
 ```
 
 - get the ssh-key
 ```bash
-cat ~/.ssh/id_ed25519.pub 
+cat ~/.ssh/id_rsa.pub
 ```
 
 - Add the ssh-key to Github.
